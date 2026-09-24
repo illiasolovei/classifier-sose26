@@ -91,13 +91,14 @@ class MushroomRepair(BaseEstimator, TransformerMixin):
         self.feature_names_in_ = np.asarray(X.columns, dtype=object)
         self.cap_upper_ = X["0"].quantile(self.cap_q)
         self.stem_min_ = X["1"].min()
+        self.width_ref_ = X["2"].median()
         return self
 
     def transform(self, X):
         X = X.copy()
         cap = np.log1p(X["0"].clip(lower=0, upper=self.cap_upper_))
         height = (X["1"] - self.stem_min_).clip(lower=0)
-        width = np.exp(-X["2"])
+        width = np.exp(X["2"] - self.width_ref_)
 
         X["0"] = cap
         X["1"] = height
